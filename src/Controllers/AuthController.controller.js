@@ -64,13 +64,24 @@ export const LoginHandler = asyncHandler(async (req, res) => {
 
     const token = createToken(findUser.email, findUser._id);
 
-    // Set the cookie
+    // Live
     res.cookie("token", token, {
         httpOnly: true,
-        sameSite: 'None',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 10 * 24 * 60 * 60 * 1000
+        sameSite: 'Strict',
+        secure: true,
+        maxAge: 10 * 24 * 60 * 60 * 1000 // 10 days
     });
+
+
+    // Local
+    // res.cookie("token", token, {
+    //     httpOnly: true,
+    //     sameSite: 'Lax',
+    //     secure: false,
+    //     maxAge: 10 * 24 * 60 * 60 * 1000 // 10 days
+    // });
+
+
 
     const userResponse = {
         _id: findUser._id,
@@ -81,6 +92,7 @@ export const LoginHandler = asyncHandler(async (req, res) => {
         lastName: findUser.lastName,
         profileImg: findUser.profileImg,
         color: findUser.color,
+        token: token
     };
 
     return res.status(200).json(new ApiResponse(200, { userResponse }, "User login successfully"));
@@ -194,13 +206,21 @@ export const RemoveImageHandler = asyncHandler(async (req, res) => {
 
 
 export const LogoutHandler = asyncHandler(async (req, res) => {
+    // Live
     res.cookie("token", "", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        // sameSite: 'Strict',
-        sameSite: 'None',
+        secure: true,
+        sameSite: 'Strict',
         maxAge: 0
     });
+
+    // Local
+    // res.cookie("token", "", {
+    //     httpOnly: true,
+    //     secure: false,
+    //     sameSite: 'Lax',
+    //     maxAge: 0
+    // });
 
     return res.status(200).json(new ApiResponse(200, {}, "User logged out successfully"));
 });
